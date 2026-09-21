@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 
 function Checkout({
   cart,
@@ -17,28 +20,26 @@ function Checkout({
 
   const [error, setError] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
 
   // Calculate total price
   const total = cart.reduce(
-
     (sum, item) =>
-
       sum +
-      Number(item.price) *
-      item.quantity,
-
+      Number(item.price) * item.quantity,
     0
-
   );
 
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
 
     event.preventDefault();
 
     setError("");
 
 
+    // Check whether all fields are filled
     if (
       !name ||
       !email ||
@@ -51,13 +52,114 @@ function Checkout({
       );
 
       return;
-
     }
 
 
-    // Demo order completion
-    onOrderComplete();
+    // Check whether cart has products
+    if (cart.length === 0) {
 
+      setError(
+        "Your cart is empty."
+      );
+
+      return;
+    }
+
+
+    // Get login token
+    const token =
+      localStorage.getItem("token");
+
+
+    // User must be logged in
+    if (!token) {
+
+      setError(
+        "Please login before placing an order."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setLoading(true);
+
+
+      // Prepare order items
+      const items = cart.map((item) => ({
+        product: item.id,
+        quantity: item.quantity
+      }));
+
+
+      // Send order to Django
+      const response = await fetch(
+        `${API_URL}/api/orders/`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization:
+              `Token ${token}`
+          },
+
+          body: JSON.stringify({
+            shipping_address: address,
+
+            phone: phone,
+
+            items: items
+          })
+        }
+      );
+
+
+      const data = await response.json();
+
+
+      // Django returned an error
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+          data.detail ||
+          "Unable to place the order."
+        );
+
+        return;
+      }
+
+
+      // Order successfully created
+      console.log(
+        "Order created:",
+        data
+      );
+
+
+      onOrderComplete();
+
+
+    } catch (error) {
+
+      console.error(
+        "Order error:",
+        error
+      );
+
+      setError(
+        "Unable to connect to the server."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
   }
 
 
@@ -66,6 +168,7 @@ function Checkout({
     <main className="checkout-page">
 
       <div className="checkout-container">
+
 
         <button
           className="back-button"
@@ -86,9 +189,11 @@ function Checkout({
               CHECKOUT
             </p>
 
+
             <h1>
               Delivery Details
             </h1>
+
 
             <p className="checkout-description">
               Enter your details to
@@ -100,11 +205,13 @@ function Checkout({
               onSubmit={handleSubmit}
             >
 
+
               <div className="form-group">
 
                 <label>
                   Full Name
                 </label>
+
 
                 <input
                   type="text"
@@ -120,11 +227,13 @@ function Checkout({
               </div>
 
 
+
               <div className="form-group">
 
                 <label>
                   Email
                 </label>
+
 
                 <input
                   type="email"
@@ -140,11 +249,13 @@ function Checkout({
               </div>
 
 
+
               <div className="form-group">
 
                 <label>
                   Phone
                 </label>
+
 
                 <input
                   type="tel"
@@ -160,11 +271,13 @@ function Checkout({
               </div>
 
 
+
               <div className="form-group">
 
                 <label>
                   Delivery Address
                 </label>
+
 
                 <textarea
                   value={address}
@@ -180,6 +293,7 @@ function Checkout({
               </div>
 
 
+
               {error && (
 
                 <p className="error-message">
@@ -189,16 +303,24 @@ function Checkout({
               )}
 
 
+
               <button
                 type="submit"
                 className="primary-button checkout-button"
+                disabled={loading}
               >
-                Place Order
+
+                {loading
+                  ? "Placing Order..."
+                  : "Place Order"}
+
               </button>
+
 
             </form>
 
           </section>
+
 
 
           {/* Order Summary */}
@@ -209,9 +331,11 @@ function Checkout({
               ORDER SUMMARY
             </p>
 
+
             <h2>
               Your Order
             </h2>
+
 
 
             <div className="summary-items">
@@ -223,10 +347,12 @@ function Checkout({
                   key={item.id}
                 >
 
+
                   <img
                     src={item.image}
                     alt={item.name}
                   />
+
 
                   <div>
 
@@ -234,13 +360,16 @@ function Checkout({
                       {item.name}
                     </h3>
 
+
                     <p>
                       Qty: {item.quantity}
                     </p>
 
                   </div>
 
+
                   <strong>
+
                     ₹
                     {(
                       Number(item.price) *
@@ -248,7 +377,9 @@ function Checkout({
                     ).toLocaleString(
                       "en-IN"
                     )}
+
                   </strong>
+
 
                 </div>
 
@@ -257,28 +388,37 @@ function Checkout({
             </div>
 
 
+
             <div className="summary-total">
 
               <span>
                 Total
               </span>
 
+
               <strong>
+
                 ₹
                 {total.toLocaleString(
                   "en-IN"
                 )}
+
               </strong>
 
             </div>
 
 
+
             <p className="demo-payment-note">
+
               This is a demo checkout.
               No real payment is processed.
+
             </p>
 
+
           </section>
+
 
         </div>
 
@@ -287,7 +427,6 @@ function Checkout({
     </main>
 
   );
-
 }
 
 

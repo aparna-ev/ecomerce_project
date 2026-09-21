@@ -1,5 +1,6 @@
-Django
+Django==5.2.9
 djangorestframework
 django-cors-headers
+psycopg2-binary
+python-dotenv
 Pillow
-mysqlclient

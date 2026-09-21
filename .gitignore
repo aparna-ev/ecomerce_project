@@ -1,0 +1,36 @@
+# Environment variables
+.env
+backend/.env
+
+# Database
+db.sqlite3
+backend/db.sqlite3
+
+# Django
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django static/media
+staticfiles/
+backend/staticfiles/
+media/
+backend/media/
+
+# Backup files
+data_backup.json
+backend/data_backup.json
+
+# Python virtual environment
+venv/
+.venv/
+backend/venv/
+backend/.venv/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Frontend build
+dist/
+frontend/dist/
