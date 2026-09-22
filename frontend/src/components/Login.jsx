@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
-function Login({ closeLogin, onLogin }) {
+function Login({ onLogin, openRegister, continueAsGuest }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -64,7 +63,7 @@ function Login({ closeLogin, onLogin }) {
         data.username || username
       );
 
-    } catch (error) {
+    } catch {
       setError(
         "Unable to connect to the server."
       );
@@ -75,16 +74,9 @@ function Login({ closeLogin, onLogin }) {
   };
 
   return (
-    <div className="auth-overlay">
+    <main className="auth-page">
 
       <div className="auth-card">
-
-        <button
-          className="auth-close-button"
-          onClick={closeLogin}
-        >
-          ×
-        </button>
 
         <div className="auth-header">
 
@@ -92,7 +84,7 @@ function Login({ closeLogin, onLogin }) {
             🔐
           </div>
 
-          <h1>Welcome Back</h1>
+          <h1>Login</h1>
 
           <p>
             Login to continue shopping.
@@ -159,13 +151,27 @@ function Login({ closeLogin, onLogin }) {
         </form>
 
 
-        <p className="auth-footer">
-          Login securely to your account.
-        </p>
+        <div className="auth-actions">
+          <button
+            type="button"
+            className="auth-link-button"
+            onClick={openRegister}
+          >
+            SignUp
+          </button>
+
+          <button
+            type="button"
+            className="auth-link-button"
+            onClick={continueAsGuest}
+          >
+            Guest
+          </button>
+        </div>
 
       </div>
 
-    </div>
+    </main>
   );
 }
 

@@ -1,13 +1,15 @@
 import { useState } from "react";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 
 function Checkout({
   cart,
   closeCheckout,
-  onOrderComplete
+  onOrderComplete,
+  isAuthenticated,
+  openLogin,
+  openRegister
 }) {
 
   const [name, setName] = useState("");
@@ -66,16 +68,12 @@ function Checkout({
     }
 
 
-    // Get login token
-    const token =
-      localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-
-    // User must be logged in
-    if (!token) {
+    if (!isAuthenticated || !token) {
 
       setError(
-        "Please login before placing an order."
+        "Please login or register to complete your order."
       );
 
       return;
@@ -102,9 +100,7 @@ function Checkout({
 
           headers: {
             "Content-Type": "application/json",
-
-            Authorization:
-              `Token ${token}`
+            Authorization: `Token ${token}`
           },
 
           body: JSON.stringify({
@@ -296,9 +292,27 @@ function Checkout({
 
               {error && (
 
-                <p className="error-message">
-                  {error}
-                </p>
+                <div className="error-message">
+                  <p>{error}</p>
+
+                  {error.includes("login or register") && (
+                    <div className="checkout-auth-actions">
+                      <button
+                        type="button"
+                        onClick={openLogin}
+                      >
+                        Login
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={openRegister}
+                      >
+                        Register
+                      </button>
+                    </div>
+                  )}
+                </div>
 
               )}
 

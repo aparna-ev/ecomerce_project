@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
-function Register({ closeRegister }) {
+function Register({ openLogin }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,7 +70,7 @@ function Register({ closeRegister }) {
       }
 
       setSuccess(
-        "Registration successful! You can now login."
+        "Registration successful. Please return to the Login page and log in with your new credentials."
       );
 
       setUsername("");
@@ -79,7 +78,7 @@ function Register({ closeRegister }) {
       setPassword("");
       setConfirmPassword("");
 
-    } catch (error) {
+    } catch {
       setError(
         "Unable to connect to the server."
       );
@@ -90,28 +89,20 @@ function Register({ closeRegister }) {
   };
 
   return (
-    <div className="auth-overlay">
+    <main className="auth-page">
 
       <div className="auth-card">
-
-        <button
-          className="auth-close-button"
-          onClick={closeRegister}
-        >
-          ×
-        </button>
-
 
         <div className="auth-header">
 
           <div className="auth-icon">
-            👤
+            📝
           </div>
 
-          <h1>Create Account</h1>
+          <h1>Register</h1>
 
           <p>
-            Register to start shopping.
+            Create an account, then log in to place orders.
           </p>
 
         </div>
@@ -199,7 +190,6 @@ function Register({ closeRegister }) {
             </p>
           )}
 
-
           {success && (
             <p className="auth-success">
               {success}
@@ -213,21 +203,26 @@ function Register({ closeRegister }) {
             disabled={loading}
           >
             {loading
-              ? "Creating account..."
-              : "Create Account"}
+              ? "Registering..."
+              : "Register"}
           </button>
 
         </form>
 
 
-        <p className="auth-footer">
-          Your account information is handled by
-          the Django backend.
-        </p>
+        <div className="auth-actions">
+          <button
+            type="button"
+            className="auth-link-button"
+            onClick={openLogin}
+          >
+            Return to Login
+          </button>
+        </div>
 
       </div>
 
-    </div>
+    </main>
   );
 }
 

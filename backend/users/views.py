@@ -27,7 +27,7 @@ class RegisterView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user = User.objects.create_user(
+        User.objects.create_user(
             username=username,
             email=email,
             password=password

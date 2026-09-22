@@ -4,16 +4,17 @@ Django settings for ecommerce project.
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-
-load_dotenv()
-
+import dj_database_url
 
 # --------------------------------------------------
 # BASE DIRECTORY
 # --------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 
 # --------------------------------------------------
@@ -116,15 +117,17 @@ TEMPLATES = [
 # DATABASE
 # --------------------------------------------------
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ImproperlyConfigured("DATABASE_URL is required.")
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-    }
+    "default": dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=0,
+        ssl_require=True,
+    )
 }
 
 
@@ -195,6 +198,15 @@ CORS_ALLOWED_ORIGINS = [
     for origin in os.environ.get(
         "CORS_ALLOWED_ORIGINS",
         "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+    if origin.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        ""
     ).split(",")
     if origin.strip()
 ]
