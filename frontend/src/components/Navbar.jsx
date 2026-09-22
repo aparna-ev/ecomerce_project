@@ -6,6 +6,7 @@ function Navbar({
   openLogin,
   openRegister,
   loggedInUser,
+  isGuestUser,
   handleLogout
 }) {
 
@@ -27,7 +28,7 @@ function Navbar({
           </span>
 
           <span className="logo-text">
-            MyStore
+            Store
           </span>
         </button>
 
@@ -58,9 +59,6 @@ function Navbar({
 
         <nav className="nav-actions">
 
-
-          {/* Login / User */}
-
           {loggedInUser ? (
 
             <div className="user-section">
@@ -82,13 +80,18 @@ function Navbar({
 
             <>
 
+              {isGuestUser && (
+                <span className="welcome-text">
+                  Guest User
+                </span>
+              )}
+
               <button
                 className="nav-button"
                 onClick={openLogin}
               >
                 Login
               </button>
-
 
               <button
                 className="nav-button register-button"

@@ -11,8 +11,7 @@ import Checkout from "./components/Checkout";
 import OrderSuccess from "./components/OrderSuccess";
 
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 
 function App() {
@@ -49,7 +48,9 @@ function App() {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(
+    !localStorage.getItem("token")
+  );
 
   const [showRegister, setShowRegister] = useState(false);
 
@@ -64,13 +65,12 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-
-  // -----------------------------
-  // Logged-in user
-  // -----------------------------
-
   const [loggedInUser, setLoggedInUser] = useState(
     localStorage.getItem("username")
+  );
+
+  const [isGuestUser, setIsGuestUser] = useState(
+    !localStorage.getItem("token")
   );
 
 
@@ -209,13 +209,6 @@ function App() {
   }
 
 
-  function closeLogin() {
-
-    setShowLogin(false);
-
-  }
-
-
   function openRegister() {
 
     setShowRegister(true);
@@ -231,22 +224,26 @@ function App() {
   }
 
 
-  function closeRegister() {
+  function continueAsGuest() {
+
+    setIsGuestUser(true);
+
+    setShowLogin(false);
 
     setShowRegister(false);
 
   }
 
 
-  // =====================================================
-  // LOGIN
-  // =====================================================
-
   function handleLogin(username) {
 
     setLoggedInUser(username);
 
+    setIsGuestUser(false);
+
     setShowLogin(false);
+
+    setShowRegister(false);
 
   }
 
@@ -258,6 +255,20 @@ function App() {
     localStorage.removeItem("username");
 
     setLoggedInUser(null);
+
+    setIsGuestUser(false);
+
+    setCart([]);
+
+    setShowLogin(true);
+
+    setShowRegister(false);
+
+    setShowCart(false);
+
+    setShowCheckout(false);
+
+    setSelectedProduct(null);
 
   }
 
@@ -569,14 +580,14 @@ function App() {
   let page;
 
 
-  if (orderCompleted) {
+  if (showLogin) {
 
     page = (
 
-      <OrderSuccess
-        closeOrderSuccess={
-          closeOrderSuccess
-        }
+      <Login
+        onLogin={handleLogin}
+        openRegister={openRegister}
+        continueAsGuest={continueAsGuest}
       />
 
     );
@@ -588,25 +599,20 @@ function App() {
     page = (
 
       <Register
-        closeRegister={
-          closeRegister
-        }
+        openLogin={openLogin}
       />
 
     );
 
   }
 
-  else if (showLogin) {
+  else if (orderCompleted) {
 
     page = (
 
-      <Login
-        closeLogin={
-          closeLogin
-        }
-        onLogin={
-          handleLogin
+      <OrderSuccess
+        closeOrderSuccess={
+          closeOrderSuccess
         }
       />
 
@@ -626,6 +632,11 @@ function App() {
         onOrderComplete={
           handleOrderComplete
         }
+        isAuthenticated={
+          Boolean(loggedInUser)
+        }
+        openLogin={openLogin}
+        openRegister={openRegister}
       />
 
     );
@@ -695,7 +706,7 @@ function App() {
           <div>
 
             <p className="hero-small-text">
-              Welcome to MyStore
+              Welcome to Store
             </p>
 
             <h1>
@@ -853,18 +864,11 @@ function App() {
         setSearchTerm={
           setSearchTerm
         }
-        openRegister={
-          openRegister
-        }
-        openLogin={
-          openLogin
-        }
-        loggedInUser={
-          loggedInUser
-        }
-        handleLogout={
-          handleLogout
-        }
+        openLogin={openLogin}
+        openRegister={openRegister}
+        loggedInUser={loggedInUser}
+        isGuestUser={isGuestUser}
+        handleLogout={handleLogout}
       />
 
 

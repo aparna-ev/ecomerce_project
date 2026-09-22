@@ -27,7 +27,7 @@ class OrderCreate(APIView):
 
         if not user.is_authenticated:
             return Response(
-                {"error": "You must be logged in to place an order."},
+                {"error": "Please login or register to complete your order."},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
