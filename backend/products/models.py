@@ -13,9 +13,7 @@ class Product(models.Model):
 
     rating = models.IntegerField()
 
-    image = models.ImageField(
-        upload_to="products/"
-    )
+    image = models.URLField(max_length=500)
 
     def __str__(self):
         return self.name

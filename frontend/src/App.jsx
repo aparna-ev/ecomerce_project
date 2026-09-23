@@ -111,7 +111,9 @@ function App() {
             ...product,
 
             image: product.image
-              ? `${API_URL}${product.image}`
+              ? /^https?:\/\//i.test(product.image)
+                ? product.image
+                : `${API_URL}${product.image}`
               : "",
 
             rating:
